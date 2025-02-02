@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
@@ -20,8 +24,16 @@ func logInit() (*os.File, error) {
 	return file, nil
 }
 
+func storageInit() (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
 func main() {
-	// router := gin.Default()
+	router := gin.Default()
 
 	file, err := logInit()
 	if err != nil {
@@ -29,4 +41,15 @@ func main() {
 		return
 	}
 	defer file.Close()
+	db, err := storageInit()
+	if err != nil {
+		log.Println("Ошибка при инициализации базы данных.")
+	}
+
+	router.GET(pingRoute, logMiddleware, ping)
+	router.GET(registerRoute, logMiddleware, register(db))
+	router.GET(loginRoute, logMiddleware, login(db))
+	router.GET(postRoute, logMiddleware, post(db))
+
+	router.Run(":8081")
 }
