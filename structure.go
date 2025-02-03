@@ -1,14 +1,5 @@
 package main
 
-import (
-	"log"
-	"net/http"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-)
-
 type validator interface {
 	isValid() bool
 }
@@ -67,27 +58,4 @@ func (c Comment) isValid() bool {
 		return false
 	}
 	return true
-}
-
-func dellUser(db *gorm.DB) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		if ROLE != 1 {
-			log.Println("Попытка обращения к защищённому маршруту.")
-			c.JSON(http.StatusForbidden, gin.H{"error": "restricted"})
-		} else {
-			id := c.Param("id")
-			delUser, err := strconv.Atoi(id)
-			if err != nil {
-				log.Println(err)
-				c.JSON(http.StatusBadRequest, gin.H{"error": err})
-			} else {
-				result := db.Table(userTab).Where("id =?", delUser).Delete(&User{})
-				if result.Error != nil {
-					log.Println(result.Error)
-					c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
-				}
-				c.JSON(http.StatusGone, gin.H{"response": "Deleted"})
-			}
-		}
-	}
 }
