@@ -18,8 +18,8 @@ var (
 	commentRoute string = "/new/comment"
 
 	delUserRoute    string = "/user/delete/:id"
-	delPostRoute    string = "/post/delete/?"
-	delCommentRoute string = "/comment/delete/?"
+	delPostRoute    string = "/post/delete/:id"
+	delCommentRoute string = "/comment/delete/:id"
 
 	userTab    string = "simple_rest_app.user"
 	postTab    string = "simple_rest_app.post"
@@ -145,7 +145,7 @@ func comment(db *gorm.DB) func(c *gin.Context) {
 	}
 }
 
-func dellUser(db *gorm.DB) func(c *gin.Context) {
+func delUser(db *gorm.DB) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		if ROLE != 1 {
 			log.Println("Попытка обращения к защищённому маршруту.")
@@ -163,6 +163,34 @@ func dellUser(db *gorm.DB) func(c *gin.Context) {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
 				}
 				c.JSON(http.StatusGone, gin.H{"response": "Deleted"})
+			}
+		}
+	}
+}
+
+func delPost(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		delPost, err := strconv.Atoi(id)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		} else {
+			result := db.Table(postTab).Where("id_user =? and id = ?", USER, delPost)
+			resultAdm := db.Table(postTab).Where("id =?", delPost)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+			} else if ROLE == 1 && resultAdm.Error != nil {
+				log.Println(resultAdm.Error)
+				c.JSON(http.StatusBadRequest, gin.H{"error": resultAdm.Error})
+			} else {
+				result = db.Table(postTab).Where("id =?", delPost).Delete(&Post{})
+				if result.Error != nil {
+					log.Println(result.Error)
+					c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+				}
+				c.JSON(http.StatusGone, gin.H{"response": "Пост успешно удалён."})
 			}
 		}
 	}

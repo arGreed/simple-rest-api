@@ -40,3 +40,11 @@
 2025/02/04 00:20:15 GET /login
 2025/02/04 00:20:25 GET /login
 2025/02/04 00:20:28 DELETE /user/delete/2
+2025/02/04 00:23:37 GET /register
+2025/02/04 00:23:43 DELETE /user/delete/2
+2025/02/04 00:47:23 POST /login
+2025/02/04 00:47:27 POST /new/post
+2025/02/04 00:47:58 DELETE /user/delete/2
+2025/02/04 00:47:58 Попытка обращения к защищённому маршруту.
+2025/02/04 00:48:14 DELETE /post/delete/5
+2025/02/04 00:48:25 POST /new/post
