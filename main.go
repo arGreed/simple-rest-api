@@ -46,11 +46,11 @@ func main() {
 		log.Println("Ошибка при инициализации базы данных.")
 	}
 
-	router.GET(pingRoute, logMiddleware, ping)
-	router.GET(registerRoute, logMiddleware, register(db))
-	router.GET(loginRoute, logMiddleware, login(db))
-	router.GET(postRoute, logMiddleware, post(db))
-	router.GET(commentRoute, logMiddleware, comment(db))
+	router.POST(pingRoute, logMiddleware, ping)
+	router.POST(registerRoute, logMiddleware, register(db))
+	router.POST(loginRoute, logMiddleware, login(db))
+	router.POST(postRoute, logMiddleware, post(db))
+	router.POST(commentRoute, logMiddleware, comment(db))
 
 	router.DELETE(delUserRoute, logMiddleware, dellUser(db))
 	//router.DELETE(delPostRoute, logMiddleware, delPost(db))
