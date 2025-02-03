@@ -12,11 +12,17 @@ var (
 	pingRoute     string = "/ping"
 	registerRoute string = "/register"
 	loginRoute    string = "/login"
-	postRoute     string = "/new/post"
-	commentRoute  string = "/new/comment"
-	userTab       string = "simple_rest_app.user"
-	postTab       string = "simple_rest_app.post"
-	commentTab    string = "simple_rest_app.post_comment"
+
+	postRoute    string = "/new/post"
+	commentRoute string = "/new/comment"
+
+	delUserRoute    string = "/user/delete/:id"
+	delPostRoute    string = "/post/delete/?"
+	delCommentRoute string = "/comment/delete/?"
+
+	userTab    string = "simple_rest_app.user"
+	postTab    string = "simple_rest_app.post"
+	commentTab string = "simple_rest_app.post_comment"
 
 	//Временное решение
 	USER int64
