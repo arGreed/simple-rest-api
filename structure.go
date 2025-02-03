@@ -46,3 +46,16 @@ func (p Post) isValid() bool {
 	}
 	return true
 }
+
+type Comment struct {
+	User    int64  `json:"-" gorm:"column:id_user"`
+	Post    int64  `json:"post" gorm:"column:id_post"`
+	Message string `json:"message" gorm:"column:comment"`
+}
+
+func (c Comment) isValid() bool {
+	if c.Post == 0 || len(c.Message) < 5 {
+		return false
+	}
+	return true
+}

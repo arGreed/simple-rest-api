@@ -50,6 +50,7 @@ func main() {
 	router.GET(registerRoute, logMiddleware, register(db))
 	router.GET(loginRoute, logMiddleware, login(db))
 	router.GET(postRoute, logMiddleware, post(db))
+	router.GET(commentRoute, logMiddleware, comment(db))
 
 	router.Run(":8081")
 }

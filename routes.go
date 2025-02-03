@@ -13,8 +13,10 @@ var (
 	registerRoute string = "/register"
 	loginRoute    string = "/login"
 	postRoute     string = "/new/post"
+	commentRoute  string = "/new/comment"
 	userTab       string = "simple_rest_app.user"
 	postTab       string = "simple_rest_app.post"
+	commentTab    string = "simple_rest_app.post_comment"
 
 	//Временное решение
 	USER int64
@@ -103,6 +105,35 @@ func post(db *gorm.DB) func(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
 		} else {
 			c.JSON(http.StatusCreated, gin.H{"created": "Пост успешно создан!"})
+		}
+	}
+}
+
+func comment(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var comment Comment
+		err := c.ShouldBindJSON(&comment)
+		if err != nil || !validate(comment) {
+			log.Println("Переданы некорректные данные!")
+			c.JSON(http.StatusBadRequest, gin.H{"errror": "Переданы некорректные данные!"})
+		}
+		var post Post
+
+		result := db.Table(postTab).Where("id = ?", comment.Post).First(&post)
+		if result.Error == gorm.ErrRecordNotFound {
+			log.Println(http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+		} else if result.Error != nil {
+			log.Println(result.Error)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+		}
+		comment.User = USER
+		result = db.Table(commentTab).Create(&comment)
+		if result.Error != nil {
+			log.Println(result.Error)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+		} else {
+			c.JSON(http.StatusCreated, gin.H{"response": "Record created"})
 		}
 	}
 }
