@@ -195,3 +195,39 @@ func delPost(db *gorm.DB) func(c *gin.Context) {
 		}
 	}
 }
+
+func delComment(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var comment Comment
+		id := c.Param("id")
+		delComment, err := strconv.Atoi(id)
+		if err != nil {
+			log.Println(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		} else {
+			resultComment := db.Table(commentTab).Where("id = ?", delComment).First(&comment)
+			if resultComment.Error == gorm.ErrRecordNotFound {
+				log.Println("Получены некорректные данные")
+				c.JSON(http.StatusBadRequest, gin.H{"error": gorm.ErrRecordNotFound})
+			} else if resultComment.Error != nil {
+				log.Println(resultComment.Error)
+
+			}
+
+			if ROLE == 1 {
+				delAdm := db.Table(commentTab).Where("id = ?", delComment).Delete(&Comment{})
+				if delAdm.Error != nil {
+					log.Println(delAdm.Error)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": delAdm.Error})
+				}
+			} else {
+				del := db.Table(commentTab).Where("id = ? and id_user = ?", delComment, USER).Delete(&Comment{})
+				if del.Error != nil {
+					log.Println(del.Error)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": del.Error})
+				}
+			}
+			c.JSON(http.StatusGone, gin.H{"response": "deleted"})
+		}
+	}
+}

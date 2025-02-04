@@ -54,7 +54,7 @@ func main() {
 
 	router.DELETE(delUserRoute, logMiddleware, delUser(db))
 	router.DELETE(delPostRoute, logMiddleware, delPost(db))
-	//router.DELETE(delCommentRoute, logMiddleware, delComment(db))
+	router.DELETE(delCommentRoute, logMiddleware, delComment(db))
 
 	router.Run(":8081")
 }
