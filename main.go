@@ -56,5 +56,9 @@ func main() {
 	router.DELETE(delPostRoute, logMiddleware, delPost(db))
 	router.DELETE(delCommentRoute, logMiddleware, delComment(db))
 
+	router.GET(usersRoute, logMiddleware, allUsers(db))
+	router.GET(postsRoute, logMiddleware, userPosts(db))
+	router.GET(commentsRoute, logMiddleware, userComments(db))
+
 	router.Run(":8081")
 }

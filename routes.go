@@ -21,6 +21,10 @@ var (
 	delPostRoute    string = "/post/delete/:id"
 	delCommentRoute string = "/comment/delete/:id"
 
+	usersRoute    string = "/user/all"
+	postsRoute    string = "/user/posts"
+	commentsRoute string = "/user/comments"
+
 	userTab    string = "simple_rest_app.user"
 	postTab    string = "simple_rest_app.post"
 	commentTab string = "simple_rest_app.post_comment"
@@ -228,6 +232,65 @@ func delComment(db *gorm.DB) func(c *gin.Context) {
 				}
 			}
 			c.JSON(http.StatusGone, gin.H{"response": "deleted"})
+		}
+	}
+}
+
+func allUsers(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var users []User
+		if ROLE == 1 {
+			result := db.Table(userTab).Find(&users)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+			}
+			c.JSON(http.StatusOK, gin.H{"users": users})
+		} else {
+			log.Println("Попытка обращения к защищённому маршруту!")
+			c.JSON(http.StatusForbidden, gin.H{"error": "Попытка обращения к защищённому маршруту!"})
+		}
+	}
+}
+
+func userPosts(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var posts []Post
+		if ROLE == 1 {
+			result := db.Table(postTab).Find(&posts)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+			}
+			c.JSON(http.StatusOK, gin.H{"posts": posts})
+		} else {
+			result := db.Table(postTab).Where("id_user = ?", USER).Find(&posts)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+			}
+			c.JSON(http.StatusOK, gin.H{"posts": posts})
+		}
+	}
+}
+
+func userComments(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var comments []Comment
+		if ROLE == 1 {
+			result := db.Table(commentTab).Find(&comments)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+			}
+			c.JSON(http.StatusOK, gin.H{"comments": comments})
+		} else {
+			result := db.Table(postTab).Where("id_user = ?", USER).Find(&comments)
+			if result.Error != nil {
+				log.Println(result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error})
+			}
+			c.JSON(http.StatusOK, gin.H{"comments": comments})
 		}
 	}
 }
